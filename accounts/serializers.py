@@ -1,6 +1,7 @@
 from djoser.serializers import UserCreateSerializer
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from .models import UserAccount, SessionYearModel, Courses, Subjects, Attendance, AttendanceReport, LeaveReportStaff, LeaveReportStudent, FeedBackStudent, FeedBackUserAccount, NotificationStudent, NotificationUserAccount, StudentResult
 User = get_user_model()
 
 
@@ -8,7 +9,13 @@ class UserCreateSerializer(UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
         model = User
         fields = ('id', 'email', 'first_name',
-                  'last_name', 'password', 'user_types',)
+                  'last_name', 'password', 'user_types', )
+
+
+class UserAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAccount
+        fields = '__all__'
 
 
 class SessionYearModelSerializer(serializers.ModelSerializer):
