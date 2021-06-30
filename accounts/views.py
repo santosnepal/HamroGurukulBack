@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import UserAccountSerializer, CoursesSerializer, SubjectsSerializer
@@ -25,8 +27,7 @@ def userSearch(request, pk):
     users = UserAccount.objects.filter(user_types=pk)
     serializer = UserAccountSerializer(users, many=True)
     return Response(serializer.data)
-
-
+@ensure_csrf_cookie
 @api_view(['POST'])
 def addCourse(request):
     serializer = CoursesSerializer(data=request.data)
@@ -52,6 +53,6 @@ def addSubject(request):
 
 @api_view(['GET'])
 def viewSubject(request):
-    subjects = Subjects.objects.all()
-    serializer = SubjectsSerializer(subjects, many=True)
+    subjectsa = Subjects.objects.all()
+    serializer = SubjectsSerializer(subjectsa, many=True)
     return Response(serializer.data)
