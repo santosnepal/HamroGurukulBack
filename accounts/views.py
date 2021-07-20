@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import UserAccountSerializer, CoursesSerializer, SubjectsSerializer
-from .models import UserAccount, SessionYearModel, Courses, Subjects
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from django.utils.decorators import method_decorator
+from .serializers import UserAccountSerializer, CoursesSerializer, SubjectsSerializer, SessionYearModelSerializer, FeedBackStudentSerializer, FeedBackUserAccountSerializer, LeaveReportStudentSerializer, LeaveReportStaffSerializer
+from .models import UserAccount, SessionYearModel, Courses, Subjects, FeedBackStudent, FeedBackUserAccount, LeaveReportStudent, LeaveReportStaff
+
 # Create your views here.
 
 
@@ -27,7 +31,31 @@ def userSearch(request, pk):
     users = UserAccount.objects.filter(user_types=pk)
     serializer = UserAccountSerializer(users, many=True)
     return Response(serializer.data)
-@ensure_csrf_cookie
+
+
+@api_view(['GET'])
+def useSearchi(request, pk):
+    users = UserAccount.objects.filter(id=pk)
+    serializer = UserAccountSerializer(users, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getCourseName(request, pk):
+    courses = Courses.objects.filter(id=pk)
+    serializer = CoursesSerializer(courses, many=True)
+    return Response(serializer.data)
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class getCsrfCookie(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        return Response({'sucess': 'CSRF cookie set'})
+
+
 @api_view(['POST'])
 def addCourse(request):
     serializer = CoursesSerializer(data=request.data)
@@ -55,4 +83,64 @@ def addSubject(request):
 def viewSubject(request):
     subjectsa = Subjects.objects.all()
     serializer = SubjectsSerializer(subjectsa, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def addSessionYear(request):
+    serializer = SessionYearModelSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def viewSessionYear(request):
+    sessionyear = SessionYearModel.object.all()
+    serializer = SessionYearModelSerializer(sessionyear, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def addStudentFeedBack(request):
+    serializer = FeedBackStudentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getStudentFeedBack(request):
+    feedback = FeedBackStudent.objects.all()
+    serializer = FeedBackStudentSerializer(feedback, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def addStaffFeedBack(request):
+    serializer = FeedBackUserAccountSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getStaffFeedBack(request):
+    feedback = FeedBackUserAccount.objects.all()
+    serializer = FeedBackUserAccountSerializer(feedback, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getStudentLeave(request):
+    leave = LeaveReportStudent.objects.all()
+    serializer = LeaveReportStudentSerializer(leave, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def addStudentLeave(request):
+    serializer = LeaveReportStudentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
     return Response(serializer.data)

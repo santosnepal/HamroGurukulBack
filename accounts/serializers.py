@@ -58,7 +58,7 @@ class LeaveReportStudentSerializer(serializers.ModelSerializer):
                   'leave_status', 'created_at', 'updated_at']
 
 
-class LeaveReportStaffStudentSerializer(serializers.ModelSerializer):
+class LeaveReportStaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveReportStaff
         fields = ['id', 'staff_id', 'leave_date', 'leave_message',
