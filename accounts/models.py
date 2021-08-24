@@ -26,7 +26,9 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     objects = UserAccountManager()
-    profile_pic = models.FileField()
+    gender = models.IntegerField(default=0)
+    course = models.IntegerField(default=None, blank=True, null=True)
+    profile_pic = models.FileField(default=None, blank=True, null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'user_types']
 
@@ -68,7 +70,7 @@ class Subjects(models.Model):
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True)
     subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING)
-    attendance_date = models.DateField()
+    attendance_date = models.DateField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     session_year_id = models.ForeignKey(
         SessionYearModel, on_delete=models.CASCADE)
@@ -112,7 +114,7 @@ class FeedBackStudent(models.Model):
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     feedback = models.TextField()
-    feedback_reply = models.TextField()
+    feedback_reply = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
@@ -122,7 +124,7 @@ class FeedBackUserAccount(models.Model):
     id = models.AutoField(primary_key=True)
     staff_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     feedback = models.TextField()
-    feedback_reply = models.TextField()
+    feedback_reply = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
@@ -155,3 +157,11 @@ class StudentResult(models.Model):
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now_add=True)
     objects = models.Manager()
+
+
+class enroledstudent(models.Model):
+    id = models.AutoField(primary_key=True)
+    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE)
+    session_year_id = models.ForeignKey(
+        SessionYearModel, on_delete=models.CASCADE)
+    student_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
